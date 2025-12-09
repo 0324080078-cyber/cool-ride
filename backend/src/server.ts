@@ -162,7 +162,18 @@ class Server {
       }
     } catch (error) {
       console.error('❌ Database connection failed:', error);
-      process.exit(1);
+      console.log('');
+      console.log('⚠️  The backend API will start but database-dependent features won\'t work.');
+      console.log('📝 To fix this:');
+      console.log('   1. Copy backend/.env.example to backend/.env');
+      console.log('   2. Configure DATABASE_URL in .env file');
+      console.log('   3. Ensure PostgreSQL is running');
+      console.log('   4. OR use Docker: docker-compose up -d');
+      console.log('');
+      console.log('💡 For now, you can still access the frontend at http://localhost:3000');
+      console.log('');
+      // Don't exit - allow server to start so frontend works
+      // process.exit(1);
     }
   }
 

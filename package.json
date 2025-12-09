@@ -6,14 +6,14 @@
   "workspaces": [
     "backend",
     "web",
-    "admin",
-    "mobile"
+    "admin"
   ],
   "scripts": {
     "install:all": "npm install && npm run install:backend && npm run install:web && npm run install:admin",
     "install:backend": "cd backend && npm install",
     "install:web": "cd web && npm install",
     "install:admin": "cd admin && npm install",
+    "install:mobile": "cd mobile && npm install --legacy-peer-deps",
     "dev:backend": "cd backend && npm run dev",
     "dev:web": "cd web && npm start",
     "dev:admin": "cd admin && npm start",

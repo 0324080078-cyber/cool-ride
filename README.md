@@ -98,9 +98,14 @@ cd cool-ride
 ### 2. Install Dependencies
 
 ```bash
-# Install all dependencies
+# Install backend, web, and admin dependencies
 npm run install:all
+
+# Optional: Install mobile dependencies (for React Native development)
+npm run install:mobile
 ```
+
+> **Note:** Having installation issues? Check the [Installation Troubleshooting Guide](./INSTALL_TROUBLESHOOTING.md) for common problems and solutions.
 
 ### 3. Environment Configuration
 

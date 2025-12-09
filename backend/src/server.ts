@@ -179,11 +179,23 @@ class Server {
 
   private async initializeRedisConnection(): Promise<void> {
     try {
-      await initializeRedis();
-      console.log('✅ Redis connected successfully');
+      const client = await initializeRedis();
+      if (client) {
+        // Redis connection successful message is logged in redis.ts
+      } else {
+        console.log('⚠️  Redis is not available. Running without caching.');
+        console.log('📝 To enable Redis:');
+        console.log('   1. Install Redis: sudo apt-get install redis-server');
+        console.log('   2. Start Redis: sudo service redis-server start');
+        console.log('   3. OR use Docker: docker-compose up -d');
+        console.log('');
+        console.log('💡 The API will work without Redis, but OTP caching will be disabled.');
+        console.log('');
+      }
     } catch (error) {
-      console.error('❌ Redis connection failed:', error);
-      // Don't exit, allow app to run without Redis
+      // Error is already handled in redis.ts, just log a simple message
+      console.log('⚠️  Redis is not available. Running without caching.');
+      console.log('');
     }
   }
 

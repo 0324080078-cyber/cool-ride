@@ -57,16 +57,20 @@ export const register = async (
     const otp = generateOTP();
     const otpExpiry = Date.now() + parseInt(process.env.OTP_EXPIRES_IN || '300000', 10);
 
-    // Store OTP in Redis
+    // Store OTP in Redis (if available)
     try {
       const redisClient = getRedisClient();
-      await redisClient.setEx(
-        `otp:${formattedPhone}`,
-        300, // 5 minutes
-        JSON.stringify({ otp, expiry: otpExpiry })
-      );
+      if (redisClient) {
+        await redisClient.setEx(
+          `otp:${formattedPhone}`,
+          300, // 5 minutes
+          JSON.stringify({ otp, expiry: otpExpiry })
+        );
+      } else {
+        console.log('⚠️  Redis not available. OTP will be returned in response (development only).');
+      }
     } catch (redisError) {
-      console.error('Redis error:', redisError);
+      console.log('⚠️  Redis error. OTP will be returned in response (development only).');
       // Continue without Redis - OTP will be in response for development
     }
 
@@ -202,17 +206,21 @@ export const verifyOtp = async (
     // Format phone number
     const formattedPhone = formatPhoneNumber(phone);
 
-    // Get OTP from Redis
+    // Get OTP from Redis (if available)
     let storedOtpData: any = null;
     try {
       const redisClient = getRedisClient();
-      const data = await redisClient.get(`otp:${formattedPhone}`);
-      if (data) {
-        storedOtpData = JSON.parse(data);
+      if (redisClient) {
+        const data = await redisClient.get(`otp:${formattedPhone}`);
+        if (data) {
+          storedOtpData = JSON.parse(data);
+        }
+      } else {
+        return next(new AppError('OTP verification requires Redis. Please set up Redis or use the development OTP.', 503));
       }
     } catch (redisError) {
-      console.error('Redis error:', redisError);
-      return next(new AppError('OTP verification service unavailable', 503));
+      console.log('⚠️  Redis error during OTP verification.');
+      return next(new AppError('OTP verification service temporarily unavailable', 503));
     }
 
     if (!storedOtpData) {
@@ -243,9 +251,11 @@ export const verifyOtp = async (
     // Delete OTP from Redis
     try {
       const redisClient = getRedisClient();
-      await redisClient.del(`otp:${formattedPhone}`);
+      if (redisClient) {
+        await redisClient.del(`otp:${formattedPhone}`);
+      }
     } catch (redisError) {
-      console.error('Redis error:', redisError);
+      console.log('⚠️  Could not delete OTP from Redis.');
     }
 
     // Generate tokens
@@ -390,17 +400,21 @@ export const resendOtp = async (
     const otp = generateOTP();
     const otpExpiry = Date.now() + parseInt(process.env.OTP_EXPIRES_IN || '300000', 10);
 
-    // Store OTP in Redis
+    // Store OTP in Redis (if available)
     try {
       const redisClient = getRedisClient();
-      await redisClient.setEx(
-        `otp:${formattedPhone}`,
-        300,
-        JSON.stringify({ otp, expiry: otpExpiry })
-      );
+      if (redisClient) {
+        await redisClient.setEx(
+          `otp:${formattedPhone}`,
+          300,
+          JSON.stringify({ otp, expiry: otpExpiry })
+        );
+      } else {
+        console.log('⚠️  Redis not available. OTP will be returned in response (development only).');
+      }
     } catch (redisError) {
-      console.error('Redis error:', redisError);
-      return next(new AppError('OTP service unavailable', 503));
+      console.log('⚠️  Redis error. OTP will be returned in response (development only).');
+      // Continue without Redis for development
     }
 
     // TODO: Send OTP via SMS

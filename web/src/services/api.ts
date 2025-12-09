@@ -28,9 +28,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired, redirect to login
+      // Token expired, remove token and redirect
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Note: In a real app, use React Router's navigate or a navigation service
+      // For now, we'll just clear the token. The app should handle this in useEffect hooks
+      console.error('Authentication expired. Please log in again.');
     }
     return Promise.reject(error);
   }

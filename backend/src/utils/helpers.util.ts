@@ -108,14 +108,16 @@ export const generateTransactionRef = (): string => {
 
 /**
  * Check if location is within Ho Township boundaries
+ * Boundaries can be configured via environment variables
  */
 export const isWithinHoTownship = (lat: number, lng: number): boolean => {
   // Approximate boundaries of Ho Township
+  // These can be overridden via environment variables
   const bounds = {
-    north: 6.65,
-    south: 6.55,
-    east: 0.50,
-    west: 0.43,
+    north: parseFloat(process.env.HO_BOUNDARY_NORTH || '6.65'),
+    south: parseFloat(process.env.HO_BOUNDARY_SOUTH || '6.55'),
+    east: parseFloat(process.env.HO_BOUNDARY_EAST || '0.50'),
+    west: parseFloat(process.env.HO_BOUNDARY_WEST || '0.43'),
   };
   
   return (

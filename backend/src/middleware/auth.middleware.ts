@@ -31,11 +31,15 @@ export const authenticate = async (
       return next(new AppError('No token provided', 401));
     }
 
+    // Ensure JWT_SECRET is set
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('FATAL: JWT_SECRET is not set in environment variables');
+      return next(new AppError('Server configuration error', 500));
+    }
+
     // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'secret'
-    ) as JwtPayload;
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
 
     // Get user from database
     const user = await User.findByPk(decoded.userId);

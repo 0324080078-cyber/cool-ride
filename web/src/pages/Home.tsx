@@ -220,7 +220,7 @@ const Home: React.FC = () => {
               <h4 className="text-lg font-bold mb-4">For Riders</h4>
               <ul className="space-y-2">
                 <li><Link to="/become-rider" className="text-gray-400 hover:text-white">Become a Rider</Link></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Rider Support</a></li>
+                <li><Link to="/support" className="text-gray-400 hover:text-white">Rider Support</Link></li>
               </ul>
             </div>
             <div>

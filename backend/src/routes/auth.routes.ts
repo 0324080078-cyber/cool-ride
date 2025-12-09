@@ -1,49 +1,21 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
+import { validate } from '../utils/validation.util';
+import {
+  registerSchema,
+  loginSchema,
+  verifyOtpSchema,
+} from '../utils/validation.util';
+import * as authController from '../controllers/auth.controller';
 
 const router = Router();
 
-// Placeholder controller functions - to be implemented
-const register = async (req: any, res: any) => {
-  res.status(201).json({
-    status: 'success',
-    message: 'Registration endpoint - to be implemented',
-  });
-};
-
-const login = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Login endpoint - to be implemented',
-  });
-};
-
-const verifyOtp = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'OTP verification endpoint - to be implemented',
-  });
-};
-
-const refreshToken = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Token refresh endpoint - to be implemented',
-  });
-};
-
-const logout = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Logout endpoint - to be implemented',
-  });
-};
-
 // Routes
-router.post('/register', register);
-router.post('/login', login);
-router.post('/verify-otp', verifyOtp);
-router.post('/refresh-token', refreshToken);
-router.post('/logout', authenticate, logout);
+router.post('/register', validate(registerSchema), authController.register);
+router.post('/login', validate(loginSchema), authController.login);
+router.post('/verify-otp', validate(verifyOtpSchema), authController.verifyOtp);
+router.post('/refresh-token', authController.refreshToken);
+router.post('/logout', authenticate, authController.logout);
+router.post('/resend-otp', authController.resendOtp);
 
 export default router;

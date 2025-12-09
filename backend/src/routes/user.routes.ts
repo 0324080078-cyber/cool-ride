@@ -1,34 +1,17 @@
 import { Router } from 'express';
-import { authenticate, authorize } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import { validate } from '../utils/validation.util';
+import { updateProfileSchema } from '../utils/validation.util';
+import * as userController from '../controllers/user.controller';
 
 const router = Router();
 
-// Placeholder controller functions
-const getProfile = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Get profile endpoint - to be implemented',
-  });
-};
-
-const updateProfile = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Update profile endpoint - to be implemented',
-  });
-};
-
-const uploadPhoto = async (req: any, res: any) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Upload photo endpoint - to be implemented',
-  });
-};
-
 // Routes
 router.use(authenticate);
-router.get('/profile', getProfile);
-router.put('/profile', updateProfile);
-router.post('/upload-photo', uploadPhoto);
+router.get('/profile', userController.getProfile);
+router.put('/profile', validate(updateProfileSchema), userController.updateProfile);
+router.post('/upload-photo', userController.uploadPhoto);
+router.post('/change-password', userController.changePassword);
+router.post('/deactivate', userController.deactivateAccount);
 
 export default router;

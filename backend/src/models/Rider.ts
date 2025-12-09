@@ -7,9 +7,9 @@ interface RiderAttributes {
   userId: string;
   fullName: string;
   profilePhoto?: string;
-  ghanaId: string;
-  licenseNumber: string;
-  licenseExpiry: Date;
+  ghanaId?: string;
+  licenseNumber?: string;
+  licenseExpiry?: Date;
   rating: number;
   totalTrips: number;
   status: 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -24,16 +24,16 @@ interface RiderAttributes {
   updatedAt?: Date;
 }
 
-interface RiderCreationAttributes extends Optional<RiderAttributes, 'id' | 'profilePhoto' | 'rating' | 'totalTrips' | 'status' | 'isOnline' | 'currentLocation' | 'totalEarnings' | 'bankAccount' | 'bankName' | 'momoNumber' | 'momoNetwork'> {}
+interface RiderCreationAttributes extends Optional<RiderAttributes, 'id' | 'profilePhoto' | 'ghanaId' | 'licenseNumber' | 'licenseExpiry' | 'rating' | 'totalTrips' | 'status' | 'isOnline' | 'currentLocation' | 'totalEarnings' | 'bankAccount' | 'bankName' | 'momoNumber' | 'momoNetwork'> {}
 
 class Rider extends Model<RiderAttributes, RiderCreationAttributes> implements RiderAttributes {
   public id!: string;
   public userId!: string;
   public fullName!: string;
   public profilePhoto?: string;
-  public ghanaId!: string;
-  public licenseNumber!: string;
-  public licenseExpiry!: Date;
+  public ghanaId?: string;
+  public licenseNumber?: string;
+  public licenseExpiry?: Date;
   public rating!: number;
   public totalTrips!: number;
   public status!: 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -75,17 +75,15 @@ Rider.init(
     },
     ghanaId: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      allowNull: true,
     },
     licenseNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      allowNull: true,
     },
     licenseExpiry: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     rating: {
       type: DataTypes.DECIMAL(3, 2),

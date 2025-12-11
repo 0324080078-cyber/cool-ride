@@ -21,8 +21,8 @@ const Home: React.FC = () => {
               <Link to="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
             </div>
             <div className="flex space-x-4">
-              <button className="btn-outline">Sign In</button>
-              <button className="btn-primary">Sign Up</button>
+              <Link to="/login" className="btn-outline">Sign In</Link>
+              <Link to="/register" className="btn-primary">Sign Up</Link>
             </div>
           </div>
         </div>
@@ -41,9 +41,9 @@ const Home: React.FC = () => {
                 Book your ride in seconds and get where you need to go!
               </p>
               <div className="flex space-x-4">
-                <button className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                <Link to="/book-ride" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
                   Book a Ride
-                </button>
+                </Link>
                 <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
                   Download App
                 </button>

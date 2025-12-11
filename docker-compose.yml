@@ -6,18 +6,20 @@ services:
     image: postgres:14-alpine
     container_name: coolrides_postgres
     environment:
-      POSTGRES_DB: coolrides_db
-      POSTGRES_USER: coolrides_user
-      POSTGRES_PASSWORD: coolrides_pass
+      POSTGRES_DB: ${POSTGRES_DB:-coolrides_db}
+      POSTGRES_USER: ${POSTGRES_USER:-coolrides_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coolrides_pass}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U coolrides_user"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-coolrides_user}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - coolrides-network
 
   # Redis Cache
   redis:
@@ -32,6 +34,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - coolrides-network
 
   # Backend API
   backend:
@@ -39,13 +43,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: coolrides_backend
+    env_file:
+      - ./backend/.env
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 5000
-      DATABASE_URL: postgresql://coolrides_user:coolrides_pass@postgres:5432/coolrides_db
+      DATABASE_URL: postgresql://${POSTGRES_USER:-coolrides_user}:${POSTGRES_PASSWORD:-coolrides_pass}@postgres:5432/${POSTGRES_DB:-coolrides_db}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-in-production}
     ports:
       - "5000:5000"
     depends_on:
@@ -57,6 +63,8 @@ services:
       - ./backend:/app
       - /app/node_modules
     command: npm run dev
+    networks:
+      - coolrides-network
 
   # Web Application
   web:
@@ -64,8 +72,12 @@ services:
       context: ./web
       dockerfile: Dockerfile
     container_name: coolrides_web
+    env_file:
+      - ./web/.env
     environment:
-      REACT_APP_API_URL: http://localhost:5000/api
+      REACT_APP_API_URL: http://localhost:5000/api/v1
+      REACT_APP_GOOGLE_MAPS_KEY: ${GOOGLE_MAPS_API_KEY:-your-google-maps-api-key}
+      REACT_APP_SOCKET_URL: http://localhost:5000
     ports:
       - "3000:3000"
     depends_on:
@@ -74,6 +86,8 @@ services:
       - ./web:/app
       - /app/node_modules
     command: npm start
+    networks:
+      - coolrides-network
 
   # Admin Dashboard
   admin:
@@ -82,7 +96,8 @@ services:
       dockerfile: Dockerfile
     container_name: coolrides_admin
     environment:
-      REACT_APP_API_URL: http://localhost:5000/api
+      REACT_APP_API_URL: http://localhost:5000/api/v1
+      REACT_APP_SOCKET_URL: http://localhost:5000
     ports:
       - "3001:3000"
     depends_on:
@@ -91,22 +106,13 @@ services:
       - ./admin:/app
       - /app/node_modules
     command: npm start
-
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: coolrides_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - backend
-      - web
-      - admin
+    networks:
+      - coolrides-network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  coolrides-network:
+    driver: bridge
